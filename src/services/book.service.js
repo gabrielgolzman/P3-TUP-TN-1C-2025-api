@@ -60,6 +60,8 @@ export const updateBook = async (req, res) => {
         available
     });
 
+    await book.save();
+
     res.send(book);
 
 };

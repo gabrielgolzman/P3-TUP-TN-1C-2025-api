@@ -1,6 +1,12 @@
 import { Router } from "express";
 
-import { createBook, deleteBook, findBook, findBooks, updateBook } from "../services/book.service.js";
+import {
+    createBook,
+    deleteBook,
+    findBook,
+    findBooks,
+    updateBook
+} from "../services/book.service.js";
 
 const router = Router();
 
