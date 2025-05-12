@@ -5,8 +5,10 @@ import { User } from "../models/User.js";
 import { validateEmail, validatePassword, validateString } from "../utils/validations.js";
 
 export const loginUser = async (req, res) => {
-    if (!validateLoginUser(req.body))
-        return res.status(400).send({ message: "Hubo un error en la solicitud" });
+    const result = validateLoginUser(req.body);
+
+    if (result.error)
+        return res.status(400).send({ message: result.message })
 
     const { email, password } = req.body;
 
@@ -25,7 +27,7 @@ export const loginUser = async (req, res) => {
         return res.status(401).send({ message: "Contraseña incorrecto" });
 
     // Generate token
-    const secretKey = 'programacion-2025';
+    const secretKey = process.env.SALT_STRING;
     const token = jwt.sign({ email }, secretKey, { expiresIn: '1h' });
 
     return res.json(token);
@@ -33,8 +35,11 @@ export const loginUser = async (req, res) => {
 
 export const registerUser = async (req, res) => {
 
-    // if (!validateRegisterUser(req.body))
-    //     return res.status(400).send({ message: "Hubo un error en la solicitud" });
+    const result = validateRegisterUser(req.body);
+
+    if (result.error)
+        return res.status(400).send({ message: result.message });
+
     const {
         name,
         email,
@@ -66,11 +71,56 @@ export const registerUser = async (req, res) => {
 
 }
 
-const validateLoginUser = ({ email, password }) => {
-    if (!validateEmail(email))
-        return false;
-    else if (!validatePassword(password, 6, 20, true, true))
-        return false;
+// Validations
+const validateLoginUser = (req) => {
+    const result = {
+        error: false,
+        message: ''
+    }
+    const { email, password } = req;
 
-    return true;
+    if (!email || !validateEmail(email))
+        return {
+            error: true,
+            message: 'Mail inválido'
+        }
+
+    else if (!password || !validatePassword(password, 7, null, true, true)) {
+        return {
+            error: true,
+            message: 'Contraseña inválida'
+        }
+    }
+
+    return result;
+}
+
+const validateRegisterUser = (req) => {
+    const result = {
+        error: false,
+        message: ''
+    }
+
+    const { name, email, password } = req;
+
+    if (!name || !validateString(name, null, 13))
+        return {
+            error: true,
+            message: 'Nombre de usuario inválido'
+        }
+
+    if (!email || !validateEmail(email))
+        return {
+            error: true,
+            message: 'Mail inválido'
+        }
+
+    else if (!password || !validatePassword(password, 7, null, true, true)) {
+        return {
+            error: true,
+            message: 'Contraseña inválida'
+        }
+    }
+
+    return result;
 }

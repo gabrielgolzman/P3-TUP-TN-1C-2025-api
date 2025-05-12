@@ -8,7 +8,7 @@ export const verifyToken = (req, res, next) => {
         return res.status(401).send({ message: "No posee autorización requerida" });
 
     try {
-        const payload = jwt.verify(token, "programacion-2025");
+        const payload = jwt.verify(token, process.env.SALT_STRING);
         console.log(payload)
         next();
     } catch (error) {

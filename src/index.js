@@ -1,4 +1,5 @@
 import express from 'express'
+import "dotenv/config"
 
 import { PORT } from './config.js';
 import { sequelize } from './db.js';
